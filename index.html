@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course Insights – MVP Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#323ED0; --blue-600:#2833B4; --blue-50:#EEF0FF; --blue-100:#DADDFB;
+  --yellow:#FFB900; --yellow-50:#FFF6DB; --peach:#FCDAB0;
+  --ink:#14142B; --ink-2:#3A3A55; --muted:#6B6B80; --line:#E5E5EE; --bg:#F6F6FA; --card:#FFFFFF;
+  --green:#127A4B; --green-50:#E5F5EC; --red:#C23434; --red-50:#FCEBEB; --amber:#9A5B00; --amber-50:#FFF2DC;
+  --radius:14px; --shadow:0 1px 2px rgba(20,20,43,.06),0 4px 16px rgba(20,20,43,.05);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:"Red Hat Display",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit;font-size:inherit}
+h1{font-size:26px;line-height:1.2;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:16px;margin:0;font-weight:700}
+h3{font-size:15px;margin:0;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+
+/* layout */
+.layout{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh;background:linear-gradient(to right,var(--ink) 232px,var(--bg) 232px)}
+.side{background:var(--ink);color:#fff;padding:20px 14px;display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh}
+.brand{display:flex;gap:10px;align-items:center;padding:0 6px}
+.mark{width:36px;height:36px;border-radius:10px;background:var(--yellow);color:var(--ink);display:grid;place-items:center;font-weight:800;font-size:15px}
+.brand b{display:block;font-size:13px}
+.brand span{font-size:12px;color:#B9B9D0}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a,.nav .off{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;color:#D8D8EA;font-weight:500}
+.nav a:hover{background:#24243F;text-decoration:none}
+.nav a.on{background:#2B2B4A;color:#fff}
+.nav .count{margin-left:auto;background:var(--yellow);color:var(--ink);border-radius:20px;font-size:11px;font-weight:700;padding:1px 7px}
+.nav .off{color:#7D7D98;cursor:not-allowed}
+.nav .off em{margin-left:auto;font-style:normal;font-size:10px;border:1px solid #4A4A66;border-radius:20px;padding:1px 6px}
+.side-foot{margin-top:auto;font-size:11.5px;color:#9C9CB8;padding:0 6px;line-height:1.5}
+.side-foot .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3DDC84;margin-right:6px}
+main{min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 32px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:5}
+.proto-tag{font-size:12px;color:var(--amber);background:var(--amber-50);border:1px solid #F3D9A6;padding:4px 10px;border-radius:20px;font-weight:600}
+.user{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--peach);display:grid;place-items:center;font-weight:700;font-size:13px}
+.user b{display:block;font-size:13px}
+.user span{font-size:12px;color:var(--muted)}
+.page{padding:26px 32px 120px;max-width:1180px}
+.crumbs{font-size:13px;color:var(--muted);margin-bottom:10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+
+/* components */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1.35fr 1fr}
+.g4{grid-template-columns:repeat(4,1fr)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:10px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:#C9C9D9;text-decoration:none}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-600)}
+.btn.dark{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.sm{padding:6px 11px;font-size:13px}
+.btn[disabled],.btn.disabled{background:#EDEDF3;border-color:#E2E2EA;color:#9A9AAE;cursor:not-allowed}
+.btn:focus-visible,a:focus-visible,tr:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--blue-100);outline-offset:1px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.pill.red{background:var(--red-50);color:var(--red)}
+.pill.green{background:var(--green-50);color:var(--green)}
+.pill.amber{background:var(--amber-50);color:var(--amber)}
+.pill.blue{background:var(--blue-50);color:var(--blue)}
+.pill.gray{background:#EEEEF3;color:var(--ink-2)}
+.tag{font-size:12px;color:var(--ink-2);background:#EEEEF3;border-radius:6px;padding:3px 8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 12px;font-weight:600;font-size:13px;cursor:pointer;color:var(--ink-2)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.callout{display:flex;gap:14px;align-items:flex-start;border-radius:var(--radius);padding:16px 18px;border:1px solid}
+.callout .ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none}
+.callout.attn{background:var(--red-50);border-color:#F3C9C9}
+.callout.attn .ic{background:#F8D5D5;color:var(--red)}
+.callout.warn{background:var(--amber-50);border-color:#F3D9A6}
+.callout.warn .ic{background:#FBE2B6;color:var(--amber)}
+.callout.good{background:var(--green-50);border-color:#BFE6D0}
+.callout.good .ic{background:#C9EDD8;color:var(--green)}
+.callout.info{background:var(--yellow-50);border-color:#F6E2A6}
+.callout.info .ic{background:var(--yellow);color:var(--ink)}
+.callout.lock{background:#F1F1F6;border-color:#DCDCE6}
+.callout.lock .ic{background:#E1E1EA;color:var(--ink-2)}
+.callout .body{flex:1;min-width:0}
+.callout .body p{margin-top:3px;color:var(--ink-2)}
+.callout .act{margin-left:auto;align-self:center}
+
+/* kpis */
+.kpi{padding:16px 18px}
+.kpi .lbl{font-size:12.5px;color:var(--muted);font-weight:600}
+.kpi .val{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:4px 0 2px}
+.kpi .sub{font-size:12px;color:var(--muted)}
+.kpi .sub.good{color:var(--green);font-weight:600}
+.kpi .sub.bad{color:var(--red);font-weight:600}
+
+/* table */
+.tbl-wrap{overflow-x:auto;margin:0 -20px;padding:0 20px}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:left;font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.row{cursor:pointer}
+tr.row:hover td{background:#FAFAFD}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.ctitle{font-weight:700}
+.ctitle small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:2px}
+.ctitle .pill{margin-top:5px}
+.score{display:inline-grid;place-items:center;min-width:42px;height:28px;border-radius:8px;font-weight:800;font-size:14px}
+.score.lo{background:var(--red-50);color:var(--red)}
+.score.mid{background:var(--amber-50);color:var(--amber)}
+.score.hi{background:var(--green-50);color:var(--green)}
+.foot-note{font-size:12px;color:var(--muted);margin-top:12px;display:flex;gap:6px;align-items:center}
+
+/* course detail */
+.impact-box{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.impact-big{width:86px;height:86px;border-radius:20px;display:grid;place-items:center;font-size:34px;font-weight:800}
+.breakdown{display:flex;gap:22px;flex-wrap:wrap}
+.breakdown div b{display:block;font-size:18px}
+.breakdown div span{font-size:12px;color:var(--muted)}
+.funnel{display:flex;flex-direction:column;gap:10px}
+.fstep{display:grid;grid-template-columns:190px 1fr 64px;gap:12px;align-items:center}
+.fstep .lab{font-size:13px;font-weight:600}
+.fstep .lab small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+.fbar{height:26px;background:#F0F0F6;border-radius:7px;position:relative;overflow:hidden}
+.fbar span{position:absolute;inset:0 auto 0 0;background:var(--blue);border-radius:7px}
+.fstep.drop .fbar span{background:var(--red)}
+.fstep .n{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.drop-tag{font-size:11.5px;color:var(--red);font-weight:700;margin:-4px 0 0 202px}
+.reasons{display:flex;flex-direction:column;gap:9px}
+.reason{display:grid;grid-template-columns:130px 1fr 40px;gap:10px;align-items:center;font-size:13px}
+.reason .rb{height:10px;background:#F0F0F6;border-radius:6px;overflow:hidden}
+.reason .rb span{display:block;height:100%;background:var(--yellow);border-radius:6px}
+.reason .pc{text-align:right;font-weight:700}
+
+/* wizard */
+.stepper{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:13px;color:var(--muted)}
+.step .dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#EEEEF3;font-size:12px;font-weight:700}
+.step.on{border-color:var(--blue);color:var(--ink)}
+.step.on .dot{background:var(--blue);color:#fff}
+.step.done{color:var(--ink)}
+.step.done .dot{background:var(--green);color:#fff}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.field label{font-weight:700;font-size:13px}
+.field .hint{font-size:12px;color:var(--muted)}
+input[type=text],textarea,select{font-family:inherit;font-size:14px;border:1px solid #D6D6E2;border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);width:100%}
+textarea{resize:vertical;min-height:62px}
+.field.err input,.field.err textarea{border-color:var(--red);background:#FFFBFB}
+.errmsg{color:var(--red);font-size:12.5px;font-weight:600;display:flex;gap:6px;align-items:center}
+.hyp{background:var(--blue-50);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.6}
+.hyp b{color:var(--blue)}
+.wiz-foot{display:flex;justify-content:space-between;gap:10px;margin-top:8px;padding-top:16px;border-top:1px solid var(--line)}
+.opt{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;margin-bottom:10px;background:#fff}
+.opt:hover{border-color:#C9C9D9}
+.opt.sel{border-color:var(--blue);background:#FAFAFF}
+.opt.dis{cursor:not-allowed;background:#F7F7FA;color:var(--muted)}
+.opt input{margin-top:3px;accent-color:var(--blue)}
+.opt .t{font-weight:700}
+.opt .d{font-size:13px;color:var(--muted);margin-top:2px}
+.ab{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.abcard{border:1px solid var(--line);border-radius:12px;padding:14px;background:#FBFBFD}
+.abcard .k{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted)}
+.abcard .t{font-weight:700;margin-top:4px}
+.client{display:grid;grid-template-columns:24px 1fr auto auto;gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--line)}
+.client input{width:18px;height:18px;accent-color:var(--blue)}
+.client.out{color:var(--muted)}
+.estimate{border-radius:12px;padding:14px 16px;margin-top:14px;border:1px solid var(--line);background:#FBFBFD}
+.estimate .row2{display:flex;gap:28px;flex-wrap:wrap;margin-top:8px}
+.estimate .row2 b{display:block;font-size:20px}
+.estimate .row2 span{font-size:12px;color:var(--muted)}
+.summary{display:grid;grid-template-columns:160px 1fr;gap:10px 16px;font-size:14px}
+.summary dt{color:var(--muted);font-weight:600}
+.summary dd{margin:0}
+
+/* results */
+.timebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:1.5px dashed #C9C9DA;border-radius:12px;padding:10px 14px;margin-bottom:16px;background:#fff}
+.timebar .lbl{font-size:12px;font-weight:700;color:var(--muted);display:flex;gap:6px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:7px 12px;font-weight:600;cursor:pointer;color:var(--ink-2);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:#fff}
+.progress{height:10px;background:#EEEEF3;border-radius:6px;overflow:hidden;margin:10px 0 6px}
+.progress span{display:block;height:100%;background:var(--blue);border-radius:6px}
+.rbars{display:flex;flex-direction:column;gap:16px;margin-top:6px}
+.rb-row{display:grid;grid-template-columns:150px 1fr 70px;gap:12px;align-items:center}
+.rb-row .nm{font-weight:700;font-size:13px}
+.rb-row .nm small{display:block;color:var(--muted);font-weight:500;font-size:11.5px}
+.rtrack{height:30px;background:#F0F0F6;border-radius:8px;position:relative}
+.rtrack .fill{position:absolute;left:0;top:0;bottom:0;border-radius:8px}
+.rtrack .ci{position:absolute;top:50%;height:2px;background:var(--ink);transform:translateY(-50%)}
+.rtrack .ci::before,.rtrack .ci::after{content:"";position:absolute;top:-6px;width:2px;height:14px;background:var(--ink)}
+.rtrack .ci::before{left:0}.rtrack .ci::after{right:0}
+.rb-row .v{font-weight:800;font-size:17px;text-align:right}
+.faded .fill{opacity:.45}
+.guard{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;background:#FBFBFD;border:1px solid var(--line);margin-top:16px;flex-wrap:wrap}
+.decision{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+.empty{text-align:center;padding:34px 20px;color:var(--muted)}
+.empty .big{width:56px;height:56px;border-radius:50%;background:var(--blue-50);color:var(--blue);display:grid;place-items:center;margin:0 auto 12px}
+.empty .big svg.i{width:24px;height:24px}
+.kv{display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+.kv div span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+
+/* guide */
+.guide{position:fixed;right:0;top:0;bottom:0;width:320px;overflow:auto;background:#fff;border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(20,20,43,.08);z-index:30;padding:20px 20px 16px}
+.layout.with-guide{padding-right:320px}
+@media (max-width:1100px){.layout.with-guide{padding-right:0}.guide{top:auto;left:auto;right:16px;bottom:16px;width:360px;max-height:calc(100vh - 32px);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 40px rgba(20,20,43,.2)}}
+.guide h3{display:flex;align-items:center;gap:8px}
+.guide .x{margin-left:auto;border:0;background:none;cursor:pointer;color:var(--muted);padding:4px}
+.guide ol,.guide ul{margin:8px 0 0;padding-left:20px;font-size:13px;color:var(--ink-2)}
+.guide li{margin-bottom:6px}
+.guide .sec{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted);margin-top:14px;text-transform:uppercase}
+.guide .gbtns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.fab{position:fixed;right:20px;bottom:20px;z-index:29;box-shadow:0 8px 24px rgba(20,20,43,.2)}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(20,20,43,.45);display:grid;place-items:center;z-index:40;padding:16px}
+.modal{background:#fff;border-radius:18px;max-width:480px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal h3{font-size:18px;margin-bottom:6px}
+.modal .acts{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
+.lp{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px}
+.lp-top{background:var(--ink);color:#fff;padding:10px 14px;font-size:12.5px;display:flex;justify-content:space-between;gap:10px}
+.lp-body{padding:20px;text-align:center}
+.lp-check{width:44px;height:44px;border-radius:50%;background:var(--green-50);color:var(--green);display:grid;place-items:center;margin:0 auto 10px}
+.faces{display:flex;justify-content:center;gap:8px;margin:12px 0 4px}
+.faces button{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-weight:800;cursor:pointer}
+.faces button.on{background:var(--yellow);border-color:var(--yellow)}
+.scale-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);max-width:250px;margin:0 auto}
+.lp-chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.lp-actions{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+.lp-note{font-size:12px;color:var(--muted);margin-top:12px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:#F0F0F6;padding:1px 5px;border-radius:5px}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:50;display:flex;gap:8px;align-items:center;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:1000px){
+  .g2{grid-template-columns:1fr}
+  .g4{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:760px){
+  .layout{grid-template-columns:1fr;background:var(--bg)}
+  .side{position:static;height:auto;flex-direction:row;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 16px}
+  .nav{flex-direction:row;flex-wrap:wrap}
+  .nav .off,.side-foot,.brand span{display:none}
+  .top{padding:10px 16px;position:static}
+  .user div{display:none}
+  .page{padding:18px 16px 120px}
+  .fstep{grid-template-columns:120px 1fr 48px}
+  .drop-tag{margin-left:132px}
+  .rb-row{grid-template-columns:96px 1fr 56px}
+  .ab{grid-template-columns:1fr}
+  .summary{grid-template-columns:1fr}
+  .guide{left:12px;right:12px;width:auto;bottom:12px}
+  .reason{grid-template-columns:100px 1fr 36px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+/* ---------- icons ---------- */
+const ICONS={
+  chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  flask:'<path d="M10 2v7.5a2 2 0 0 1-.2.9L4.7 20.5a1 1 0 0 0 .9 1.5h12.8a1 1 0 0 0 .9-1.5l-5.1-10.1a2 2 0 0 1-.2-.9V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  warn:'<path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  left:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  right:'<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+  x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  ff:'<polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/>',
+  down:'<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>',
+  up:'<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><polygon points="16.2 7.8 14.1 14.1 7.8 16.2 9.9 9.9 16.2 7.8"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
+  send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  bulb:'<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
+  reset:'<polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/>',
+  bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>'
+};
+const ic=(n,s)=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true"${s?` style="width:${s}px;height:${s}px"`:''}>${ICONS[n]}</svg>`;
+const lc1=s=>/^[A-Z][a-z]/.test(s)?s[0].toLowerCase()+s.slice(1):s;
+const clean=s=>lc1(String(s).trim().replace(/[.\s]+$/,''));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n).toLocaleString('en-US');
+const today=()=>new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+/* ---------- data (illustrative) ---------- */
+const SEED_COURSES=[
+  {id:'phishing',title:'Cybersecurity Basics: Phishing',cat:'Compliance',learners:18400,completion:94,uplift:4,rating:3.4,trend:[60,60,59,59,58,58,58,58],modules:4},
+  {id:'gdpr',title:'GDPR Essentials 2026',cat:'Compliance',learners:21300,completion:96,uplift:12,rating:3.9,trend:[71,71,72,72,72,73,73,73],modules:3},
+  {id:'abc',title:'Anti-Bribery & Corruption',cat:'Compliance',learners:9800,completion:91,uplift:9,rating:3.6,trend:[66,66,65,65,65,65,65,65],modules:3},
+  {id:'storytelling',title:'Data Storytelling for Managers',cat:'Upskilling',learners:1240,completion:35,uplift:9,rating:3.1,trend:[47,46,45,44,43,42,41,41],modules:4},
+  {id:'excel',title:'Excel for Analysts',cat:'Upskilling',learners:3900,completion:58,uplift:22,rating:4.4,trend:[69,70,71,73,75,76,76,76],modules:5},
+  {id:'ai',title:'Intro to AI at Work',cat:'Upskilling',learners:5600,completion:41,uplift:11,rating:3.8,trend:[48,49,49,49,49,50,49,49],modules:4},
+  {id:'feedback',title:'Giving Feedback That Lands',cat:'Soft skills',learners:2700,completion:62,uplift:14,rating:4.5,trend:[63,63,64,64,65,65,65,65],modules:3},
+  {id:'remote',title:'Remote Team Leadership',cat:'Soft skills',learners:1850,completion:29,uplift:7,rating:3.2,trend:[39,38,38,37,37,36,36,36],modules:4}
+];
+const CLIENTS=[
+  {id:'acme',name:'Acme Logistics',share:.34,optIn:true},
+  {id:'nordwind',name:'Nordwind Bank',share:.25,optIn:false},
+  {id:'carpathia',name:'Carpathia Retail',share:.22,optIn:true},
+  {id:'helix',name:'Helix Pharma',share:.19,optIn:true}
+];
+const METRICS={
+  m1:{label:'Module 1 completion',unit:'%',max:100,dec:0,mid:[51,63,14,78],fin:[49,68,5,97]},
+  completion:{label:'Course completion',unit:'%',max:100,dec:0,mid:[33,41,13,71],fin:[35,44,4,96]},
+  quiz:{label:'Final quiz score',unit:' pts',max:100,dec:0,mid:[74,79,9,69],fin:[72,78,3,95]},
+  rating:{label:'Learner rating',unit:'/5',max:5,dec:1,mid:[3.2,3.8,.6,72],fin:[3.1,4.0,.2,96]},
+  deadline:{label:'Completion before deadline',unit:'%',max:100,dec:0,mid:[79,86,12,74],fin:[81,88,3,98]}
+};
+const GUARDS={
+  quiz:{label:'Final quiz score',a:'78',b:'79'},
+  rating:{label:'Learner rating',a:'3.1/5',b:'3.9/5'},
+  completion:{label:'Course completion',a:'35%',b:'37%'},
+  unsub:{label:'Reminder unsubscribes',a:'0.4%',b:'0.5%'}
+};
+const VARIANTS={
+  content:[
+    {id:'v2',name:'Short videos',t:'v2 · Short videos',d:'Module 1 video split into 3 videos of about 5 minutes. Uploaded by the content team as a new SCORM package.'},
+    {id:'v3',name:'Checkpoint quiz',t:'v3 · Checkpoint quiz',d:'Same video, with a 2-question checkpoint halfway through.'}
+  ],
+  delivery:[
+    {id:'thu',name:'Thursday reminder',t:'Reminder on Thursday at 14:00',d:'One reminder, later in the week. Course content is unchanged.'},
+    {id:'two',name:'Two short reminders',t:'Two short reminders',d:'Tuesday 10:00 and Thursday 14:00. Course content is unchanged.'}
+  ]
+};
+const REQUIRED=760, DAILY=.0584, MIN_DAYS=7;
+
+function seedState(){
+  return {
+    courses:JSON.parse(JSON.stringify(SEED_COURSES)),
+    experiments:[{
+      id:'exp-1',courseId:'excel',kind:'content',name:'Practice quiz vs. current version',
+      change:'add a 3-question practice quiz after each module',why:'learners said they weren’t sure they understood the formulas',
+      metric:'quiz',guardrail:'completion',variantName:'Practice quiz',controlName:'v1 · Current course',
+      clients:['acme','carpathia','helix'],learners:2900,days:9,stage:'fin',status:'rolled',decidedOn:'2 Oct 2026'
+    }],
+    filter:'All',draft:null,guide:window.innerWidth>760,modal:null
+  };
+}
+let S=seedState();
+
+const course=id=>S.courses.find(c=>c.id===id);
+const isCompliance=c=>c.cat==='Compliance';
+const impact=c=>Math.round(.4*c.completion+.4*Math.min(c.uplift/25,1)*100+.2*(c.rating/5)*100);
+const scoreCls=v=>v<45?'lo':v<65?'mid':'hi';
+const running=()=>S.experiments.filter(e=>e.status==='running');
+const expForCourse=id=>S.experiments.filter(e=>e.courseId===id);
+
+/* ---------- shell ---------- */
+function shell(route,content){
+  const r=running().length;
+  return `<div class="layout ${S.guide?'with-guide':''}">
+  <aside class="side">
+    <div class="brand"><div class="mark">BL</div><div><b>B2B Online Learning</b><span>Course Insights</span></div></div>
+    <nav class="nav" aria-label="Main">
+      <a href="#/insights" class="${route==='insights'||route==='course'?'on':''}">${ic('chart')} Insights</a>
+      <a href="#/experiments" class="${route==='experiments'||route==='exp'||route==='new'?'on':''}">${ic('flask')} Experiments ${r?`<span class="count">${r}</span>`:''}</a>
+      <span class="off" title="Not part of this MVP">${ic('bulb')} Idea intake <em>Phase 2</em></span>
+      <span class="off" title="Not part of this MVP">${ic('users')} Client reports <em>Phase 3</em></span>
+    </nav>
+    <div class="side-foot"><span class="dot"></span>Data: SCORM + Amplitude<br>Updated 2 hours ago</div>
+  </aside>
+  <main>
+    <header class="top">
+      <span class="proto-tag">Clickable prototype · illustrative data</span>
+      <div class="user"><div class="avatar">MI</div><div><b>Maria Ionescu</b><span>Head of Content</span></div></div>
+    </header>
+    <div class="page">${content}</div>
+  </main>
+</div>
+${S.guide?guide():`<button class="btn dark fab" data-act="guide">${ic('compass')} Prototype guide</button>`}
+${S.modal?modal():''}`;
+}
+
+function guide(){
+  return `<aside class="guide" aria-label="Prototype guide">
+  <h3>${ic('compass')} Prototype guide <button class="x" data-act="closeGuide" aria-label="Close guide">${ic('x')}</button></h3>
+  <p class="small muted" style="margin-top:6px">You are <b>Maria, Head of Content</b>. Your goal: find a course that isn’t working and test a fix before asking tech to build anything.</p>
+  <div class="sec">Core flow (happy path)</div>
+  <ol>
+    <li>Open <b>Data Storytelling for Managers</b> (flagged red)</li>
+    <li>See where learners drop off, then <b>Create experiment</b></li>
+    <li>Go through hypothesis, variant and audience, then <b>Launch</b></li>
+    <li>Use the time controls to move to the final day</li>
+    <li><b>Roll out</b> the winning version</li>
+  </ol>
+  <div class="sec">Edge and error states</div>
+  <ul>
+    <li><b>Mid-test result:</b> on day 6 the decision stays locked, because there isn’t enough data yet</li>
+    <li><b>Compliance course</b> (e.g. GDPR Essentials): content tests are blocked, with a safe alternative</li>
+    <li><b>Audience:</b> Nordwind Bank opted out of experiments. Untick every client to see the error, or keep only Helix Pharma to see the “too small” warning</li>
+    <li><b>Hypothesis:</b> clear a field and press Next</li>
+  </ul>
+  <div class="gbtns">
+    <a class="btn primary sm" href="#/course/storytelling">Start the core flow ${ic('right')}</a>
+    <button class="btn sm" data-act="reset">${ic('reset')} Reset demo</button>
+  </div>
+</aside>`;
+}
+
+/* ---------- views ---------- */
+function spark(vals){
+  const w=84,h=26,min=Math.min(...vals)-2,max=Math.max(...vals)+2;
+  const pts=vals.map((v,i)=>`${(i/(vals.length-1))*w},${h-((v-min)/(max-min))*h}`).join(' ');
+  const down=vals[vals.length-1]<vals[0]-2, up=vals[vals.length-1]>vals[0]+2;
+  const col=down?'#C23434':up?'#127A4B':'#8A8AA0';
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-label="8-week trend"><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+function viewInsights(){
+  const cs=S.courses;
+  const avg=Math.round(cs.reduce((a,c)=>a+impact(c),0)/cs.length);
+  const attn=cs.filter(c=>impact(c)<45);
+  const cats=['All','Compliance','Upskilling','Soft skills'];
+  const rows=cs.filter(c=>S.filter==='All'||c.cat===S.filter).sort((a,b)=>impact(a)-impact(b));
+  const st=course('storytelling');
+  const stExp=expForCourse('storytelling').find(e=>e.status!=='kept');
+  return `
+  <div class="page-head"><div><h1>Course Insights</h1><p class="muted">Which courses work, and where learners get stuck. Last 90 days, all clients.</p></div></div>
+  <div class="grid g4" style="margin-bottom:16px">
+    <div class="card kpi"><div class="lbl">Course launches tracked</div><div class="val">92%</div><div class="sub good">${ic('check',13)} Goal: 90%</div></div>
+    <div class="card kpi"><div class="lbl">Avg. Course Impact Score</div><div class="val">${avg}</div><div class="sub">out of 100</div></div>
+    <div class="card kpi"><div class="lbl">Courses needing attention</div><div class="val">${attn.length}</div><div class="sub bad">Impact score below 45</div></div>
+    <div class="card kpi"><div class="lbl">Experiments running</div><div class="val">${running().length}</div><div class="sub">${S.experiments.filter(e=>e.status==='rolled').length} winner(s) rolled out</div></div>
+  </div>
+  ${stExp?'':`<div class="callout attn" style="margin-bottom:16px">
+    <div class="ic">${ic('down')}</div>
+    <div class="body"><b>${esc(st.title)} lost 6 points in 8 weeks.</b><p>Almost half of the learners who start it stop during Module 1.</p></div>
+    <a class="btn sm act" href="#/course/storytelling">Investigate ${ic('right')}</a>
+  </div>`}
+  <div class="card">
+    <div class="card-head"><h2>All courses</h2>
+      <div class="chips" role="group" aria-label="Filter by type">${cats.map(c=>`<button class="chip ${S.filter===c?'on':''}" data-act="filter" data-arg="${c}">${c}</button>`).join('')}</div>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Course</th><th class="num">Learners</th><th class="num">Completion</th><th class="num">Score gain</th><th class="num">Rating</th><th class="num">Impact ↑</th><th>8-week trend</th></tr></thead>
+      <tbody>${rows.map(c=>{
+        const v=impact(c), ex=expForCourse(c.id), run=ex.find(e=>e.status==='running'), rolled=ex.find(e=>e.status==='rolled');
+        const flag=run?`<span class="pill blue">${ic('flask',12)} Experiment running</span>`:rolled?`<span class="pill green">${ic('up',12)} Winner rolled out</span>`:v<45?`<span class="pill red">Needs attention</span>`:'';
+        return `<tr class="row" data-go="#/course/${c.id}" tabindex="0">
+          <td><div class="ctitle">${esc(c.title)}<small>${c.cat} · ${c.modules} modules</small>${flag}</div></td>
+          <td class="num">${fmt(c.learners)}</td>
+          <td class="num">${c.completion}%</td>
+          <td class="num">+${c.uplift} pts</td>
+          <td class="num">${c.rating.toFixed(1)}</td>
+          <td class="num"><span class="score ${scoreCls(v)}">${v}</span></td>
+          <td>${spark(c.trend)}</td></tr>`}).join('')}</tbody>
+    </table></div>
+    <div class="foot-note">${ic('info',14)} Course Impact Score = 40% completion + 40% score improvement (pre-test vs. final quiz) + 20% learner rating.</div>
+  </div>`;
+}
+
+function funnelFor(c){
+  if(c.id==='storytelling') return [
+    {l:'Enrolled',s:'',n:1240},{l:'Started',s:'',n:1050},
+    {l:'Finished Module 1',s:'Why stories beat charts · 14-min video',n:546},
+    {l:'Finished Module 2',s:'Structuring your narrative',n:490},
+    {l:'Finished Module 3',s:'Visual choices',n:452},
+    {l:'Passed final quiz',s:'',n:434}];
+  const L=c.learners, st=Math.round(L*Math.max(.9,Math.min(.99,(c.completion+3)/100))), fin=Math.round(L*c.completion/100), gap=Math.max(st-fin,0);
+  const w=[.45,.25,.3];
+  let cur=st; const out=[{l:'Enrolled',s:'',n:L},{l:'Started',s:'',n:st}];
+  w.forEach((x,i)=>{cur=Math.round(cur-gap*x); out.push({l:i<2?`Finished Module ${i+1}`:'Passed final quiz',s:'',n:i<2?cur:fin});});
+  return out;
+}
+function reasonsFor(c){
+  if(c.id==='storytelling') return [['Too long',46],['Very useful',27],['Not relevant to my job',18],['Too basic',9]];
+  const g=Math.round((c.rating-2.5)/2.5*70)+10;
+  return [['Very useful',g],['Too long',Math.round((100-g)*.4)],['Not relevant to my job',Math.round((100-g)*.35)],['Too basic',100-g-Math.round((100-g)*.4)-Math.round((100-g)*.35)]].sort((a,b)=>b[1]-a[1]);
+}
+
+function viewCourse(id){
+  const c=course(id); if(!c) return notFound();
+  const v=impact(c), comp=isCompliance(c), f=funnelFor(c);
+  let maxDrop=0,dropIdx=-1;
+  f.forEach((s,i)=>{ if(i>1){const d=(f[i-1].n-s.n)/f[i-1].n; if(d>maxDrop){maxDrop=d;dropIdx=i;}}});
+  if(maxDrop<.08) dropIdx=-1;
+  const exps=expForCourse(id), run=exps.find(e=>e.status==='running'), rolled=exps.find(e=>e.status==='rolled');
+  const story=id==='storytelling';
+  const cta = comp
+    ? `<button class="btn disabled" disabled title="Content experiments are off for compliance courses">${ic('lock')} Create experiment</button>`
+    : run ? `<a class="btn" href="#/exp/${run.id}">${ic('flask')} View running experiment</a>`
+    : `<button class="btn primary" data-act="newExp" data-arg="${id}">${ic('flask')} Create experiment</button>`;
+  const insight = c.id==='phishing'
+    ? `<b>High completion, low behaviour change.</b><p>94% finish this course, but the share of employees failing phishing simulations only moved from 18% to 17%. Finishing the course and changing behaviour are measured separately here.</p>`
+    : story
+    ? `<b>48% of learners who start stop during Module 1.</b><p>It has the longest video in the course (14 min). Most learners leave it after about 6 minutes, and “Too long” is the top reason in their ratings.</p>`
+    : dropIdx<0 ? `<b>No major drop-off.</b><p>Learners move through this course evenly.</p>`
+    : `<b>The biggest drop happens before “${f[dropIdx].l}” (−${Math.round(maxDrop*100)}%).</b><p>This is the step to look at first.</p>`;
+  return `
+  <div class="crumbs"><a href="#/insights">Insights</a> / <span>${esc(c.title)}</span></div>
+  <div class="page-head">
+    <div><h1>${esc(c.title)}</h1>
+      <div class="chips" style="margin-top:6px"><span class="tag">${c.cat}</span><span class="tag">SCORM 2004</span><span class="tag">${c.modules} modules</span><span class="tag">${fmt(c.learners)} learners</span></div>
+    </div>
+    <div>${cta}</div>
+  </div>
+  ${rolled?`<div class="callout good" style="margin-bottom:16px"><div class="ic">${ic('check')}</div><div class="body"><b>Winner rolled out on ${esc(rolled.decidedOn)}: “${esc(rolled.variantName)}”.</b><p>The Impact Score will update as new learners go through the new version.</p></div><a class="btn sm act" href="#/exp/${rolled.id}">See results</a></div>`:''}
+  ${run?`<div class="callout info" style="margin-bottom:16px"><div class="ic">${ic('flask')}</div><div class="body"><b>Experiment running: ${esc(run.name)}</b><p>Each learner sees only one version, start to finish.</p></div><a class="btn sm act" href="#/exp/${run.id}">Open</a></div>`:''}
+  ${comp?`<div class="callout lock" style="margin-bottom:16px">
+    <div class="ic">${ic('lock')}</div>
+    <div class="body"><b>Content experiments are off for compliance courses</b>
+      <p>Regulations require every learner to get identical content, so we can’t show different versions of this course. You can still test <i>how</i> it’s delivered, such as reminder timing, without touching the content.</p></div>
+    <button class="btn sm act" data-act="newDelivery" data-arg="${id}">${ic('bell')} Test reminder timing</button>
+  </div>`:''}
+  <div class="card" style="margin-bottom:16px">
+    <div class="impact-box">
+      <div class="impact-big score ${scoreCls(v)}">${v}</div>
+      <div><div class="small muted" style="font-weight:700">COURSE IMPACT SCORE</div>
+        <div class="breakdown" style="margin-top:6px">
+          <div><b>${c.completion}%</b><span>Completion</span></div>
+          <div><b>+${c.uplift} pts</b><span>Score improvement</span></div>
+          <div><b>${c.rating.toFixed(1)}/5</b><span>Learner rating</span></div>
+          <div>${spark(c.trend)}<span style="display:block">8-week trend</span></div>
+        </div></div>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-head"><h2>Where learners drop off</h2><span class="small muted">SCORM bookmarks + Amplitude events</span></div>
+      <div class="funnel">${f.map((s,i)=>`
+        <div class="fstep ${i===dropIdx?'drop':''}"><div class="lab">${s.l}${s.s?`<small>${s.s}</small>`:''}</div>
+          <div class="fbar"><span style="width:${(s.n/f[0].n*100).toFixed(1)}%"></span></div><div class="n">${fmt(s.n)}</div></div>
+        ${i===dropIdx?`<div class="drop-tag">▲ −${Math.round(maxDrop*100)}% from previous step</div>`:''}`).join('')}
+      </div>
+    </div>
+    <div class="stack">
+      <div class="callout info"><div class="ic">${ic('bulb')}</div><div class="body">${insight}</div></div>
+      <div class="card">
+        <div class="card-head"><h2>What learners say</h2><button class="btn sm" data-act="preview">${ic('eye')} Preview</button></div>
+        <div class="reasons">${reasonsFor(c).map(([l,p])=>`<div class="reason"><span>${l}</span><div class="rb"><span style="width:${p}%"></span></div><span class="pc">${p}%</span></div>`).join('')}</div>
+        <div class="foot-note">${ic('msg',14)} One-click rating at the end of each module · ${fmt(Math.round(c.learners*.38))} responses</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- wizard ---------- */
+function newDraft(courseId,kind){
+  const story=courseId==='storytelling';
+  const base={courseId,kind,step:1,errors:{},clients:{acme:true,carpathia:true,helix:true}};
+  if(kind==='delivery') return {...base,change:'send the course reminder on Thursday afternoon instead of Monday morning',why:'Monday inboxes are full, and most learners open reminders later in the week',metric:'deadline',guardrail:'unsub',variant:'thu'};
+  return {...base,
+    change: story?'split the 14-min Module 1 video into 3 videos of about 5 minutes':'shorten the module where most learners stop',
+    why: story?'most learners leave the Module 1 video after about 6 minutes':'that is where the biggest drop-off happens',
+    metric:'m1',guardrail:'quiz',variant:'v2'};
+}
+function estimate(d){
+  const c=course(d.courseId);
+  const sel=CLIENTS.filter(k=>k.optIn&&d.clients[k.id]);
+  const learners=sel.reduce((a,k)=>a+Math.round(c.learners*k.share),0);
+  const days=learners?Math.max(MIN_DAYS,Math.ceil(REQUIRED/(learners*DAILY))):0;
+  return {sel,learners,days,perDay:Math.round(learners*DAILY)};
+}
+function validate(d){
+  const e={};
+  if(d.step===1){
+    if(!d.change.trim()) e.change='Describe the change you want to test.';
+    if(!d.why.trim()) e.why='Add the reason you think it will work. It helps everyone learn from the result.';
+  }
+  if(d.step===3 && !estimate(d).sel.length) e.clients='Select at least one client. Only clients who opted in to experiments can be included.';
+  return e;
+}
+function viewNew(courseId,kind){
+  const c=course(courseId); if(!c) return notFound();
+  if(isCompliance(c)&&kind!=='delivery') kind='delivery';
+  if(!S.draft||S.draft.courseId!==courseId||S.draft.kind!==kind) S.draft=newDraft(courseId,kind);
+  const d=S.draft, steps=['Hypothesis','Variant','Audience','Review'];
+  const metricOpts=kind==='delivery'?['deadline']:['m1','completion','quiz','rating'];
+  const guardOpts=kind==='delivery'?['unsub']:['quiz','rating','completion'].filter(g=>g!==d.metric);
+  if(!guardOpts.includes(d.guardrail)) d.guardrail=guardOpts[0];
+  const vars=VARIANTS[kind], v=vars.find(x=>x.id===d.variant)||vars[0];
+  const controlName=kind==='delivery'?'Current: Monday at 09:00':'v1 · Current course';
+  const est=estimate(d);
+  let body='';
+  if(d.step===1){
+    body=`<h2 style="margin-bottom:4px">What do you want to learn?</h2><p class="muted" style="margin-bottom:16px">Every idea starts as a hypothesis, so the result teaches us something even if it loses.</p>
+    <div class="field ${d.errors.change?'err':''}"><label for="f-change">If we…</label>
+      <input type="text" id="f-change" data-field="change" value="${esc(d.change)}" placeholder="e.g. split the long video into shorter ones">
+      ${d.errors.change?`<div class="errmsg">${ic('warn',14)} ${d.errors.change}</div>`:''}</div>
+    <div class="field"><label for="f-metric">…then this metric will improve</label>
+      <select id="f-metric" data-field="metric">${metricOpts.map(m=>`<option value="${m}" ${d.metric===m?'selected':''}>${METRICS[m].label}</option>`).join('')}</select></div>
+    <div class="field ${d.errors.why?'err':''}"><label for="f-why">…because</label>
+      <textarea id="f-why" data-field="why" placeholder="What makes you think so?">${esc(d.why)}</textarea>
+      ${d.errors.why?`<div class="errmsg">${ic('warn',14)} ${d.errors.why}</div>`:''}</div>
+    <div class="field"><label for="f-guard">Guardrail: this must not get worse</label>
+      <select id="f-guard" data-field="guardrail">${guardOpts.map(m=>`<option value="${m}" ${d.guardrail===m?'selected':''}>${GUARDS[m].label}</option>`).join('')}</select>
+      <span class="hint">Protects us from “wins” that hurt learning, e.g. higher completion but lower quiz scores.</span></div>`;
+  } else if(d.step===2){
+    body=`<h2 style="margin-bottom:4px">${kind==='delivery'?'Which reminder schedule do you want to test?':'Which version do you want to test?'}</h2>
+    <p class="muted" style="margin-bottom:16px">${kind==='delivery'?'The course stays identical for everyone. Only the reminder changes.':'Learners get either the current course (A) or the new version (B), never both.'}</p>
+    <div class="ab"><div class="abcard"><div class="k">A · CONTROL</div><div class="t">${controlName}</div><div class="small muted">What learners get today</div></div>
+      <div class="abcard" style="border-color:var(--blue);background:#FAFAFF"><div class="k" style="color:var(--blue)">B · VARIANT</div><div class="t">${v.t}</div><div class="small muted">Selected below</div></div></div>
+    ${vars.map(x=>`<label class="opt ${d.variant===x.id?'sel':''}"><input type="radio" name="variant" value="${x.id}" ${d.variant===x.id?'checked':''}><div><div class="t">${x.t}</div><div class="d">${x.d}</div></div></label>`).join('')}
+    ${kind==='content'?`<div class="opt dis"><input type="radio" disabled><div><div class="t">Upload a new SCORM package</div><div class="d">In the real product: drag and drop a .zip. Not available in this prototype.</div></div></div>`:''}`;
+  } else if(d.step===3){
+    const warn=est.days>30;
+    body=`<h2 style="margin-bottom:4px">Who takes part?</h2><p class="muted" style="margin-bottom:12px">Learners from the selected clients are split 50/50 at random. Each learner sees only one version.</p>
+    ${d.errors.clients?`<div class="errmsg" style="margin-bottom:8px">${ic('warn',14)} ${d.errors.clients}</div>`:''}
+    <div>${CLIENTS.map(k=>{const n=Math.round(c.learners*k.share);return `<label class="client ${k.optIn?'':'out'}">
+      <input type="checkbox" data-client="${k.id}" ${k.optIn&&d.clients[k.id]?'checked':''} ${k.optIn?'':'disabled'}>
+      <div><b>${k.name}</b><div class="small muted">${fmt(n)} learners in this course</div></div>
+      ${k.optIn?'<span class="pill green">Opted in</span>':'<span class="pill gray">'+ic('lock',12)+' Opted out of experiments</span>'}
+      <span></span></label>`}).join('')}</div>
+    <div class="estimate">
+      <div style="font-weight:700">Estimate</div>
+      <div class="row2">
+        <div><b>${fmt(est.learners)}</b><span>learners in audience</span></div>
+        <div><b>${fmt(REQUIRED)}</b><span>needed (${REQUIRED/2} per group)</span></div>
+        <div><b>${est.days?`~${est.days} days`:'—'}</b><span>to a reliable result</span></div>
+      </div>
+      <div class="small muted" style="margin-top:8px">Sized to detect a change of 10 points or more. Tests run at least ${MIN_DAYS} days to cover a full week.</div>
+    </div>
+    ${warn?`<div class="callout warn" style="margin-top:12px"><div class="ic">${ic('clock')}</div><div class="body"><b>This audience is small: about ${est.days} days to a result.</b><p>Add another client, or test a bigger change so it’s easier to detect. You can still launch.</p></div></div>`:''}`;
+  } else {
+    const m=METRICS[d.metric];
+    body=`<h2 style="margin-bottom:12px">Review and launch</h2>
+    <div class="hyp">If we <b>${esc(clean(d.change))}</b>, then <b>${m.label.toLowerCase()}</b> will improve, because ${esc(clean(d.why))}.</div>
+    <dl class="summary" style="margin-top:16px">
+      <dt>Course</dt><dd>${esc(c.title)}</dd>
+      <dt>A · Control</dt><dd>${controlName}</dd>
+      <dt>B · Variant</dt><dd>${v.t}</dd>
+      <dt>Primary metric</dt><dd>${m.label}</dd>
+      <dt>Guardrail</dt><dd>${GUARDS[d.guardrail].label} must not drop</dd>
+      <dt>Audience</dt><dd>${est.sel.map(k=>k.name).join(', ')} · ${fmt(est.learners)} learners · 50/50 split</dd>
+      <dt>Expected duration</dt><dd>~${est.days} days</dd>
+    </dl>
+    <div class="callout info" style="margin-top:16px"><div class="ic">${ic('info')}</div><div class="body"><b>No extra work for tech.</b><p>The experimentation tool assigns learners and Amplitude collects the results. Learners won’t notice anything different.</p></div></div>`;
+  }
+  return `
+  <div class="crumbs"><a href="#/insights">Insights</a> / <a href="#/course/${c.id}">${esc(c.title)}</a> / <span>New experiment</span></div>
+  <div class="page-head"><div><h1>${kind==='delivery'?'New delivery experiment':'New experiment'}</h1><p class="muted">${esc(c.title)}</p></div></div>
+  <div class="stepper">${steps.map((s,i)=>`<div class="step ${i+1===d.step?'on':i+1<d.step?'done':''}"><span class="dot">${i+1<d.step?ic('check',12):i+1}</span>${s}</div>`).join('')}</div>
+  <div class="card" style="max-width:760px">${body}
+    <div class="wiz-foot">
+      <button class="btn" data-act="back">${ic('left')} ${d.step===1?'Cancel':'Back'}</button>
+      ${d.step<4?`<button class="btn primary" data-act="next">Next ${ic('right')}</button>`:`<button class="btn primary" data-act="launch">${ic('send')} Launch experiment</button>`}
+    </div>
+  </div>`;
+}
+
+/* ---------- results ---------- */
+function viewExp(id){
+  const e=S.experiments.find(x=>x.id===id); if(!e) return notFound();
+  const c=course(e.courseId), m=METRICS[e.metric], g=GUARDS[e.guardrail];
+  const midDay=Math.max(2,Math.ceil(e.days*.4)), finDay=e.days+1;
+  const n=e.stage==='start'?Math.round(REQUIRED*.05):e.stage==='mid'?Math.round(REQUIRED*.41):REQUIRED+14;
+  const day=e.stage==='start'?1:e.stage==='mid'?midDay:finDay;
+  const vals=e.stage==='fin'?m.fin:m.mid;
+  const fx=x=>m.dec?x.toFixed(m.dec):x;
+  const lift=(vals[1]-vals[0]);
+  const status=e.status==='rolled'?'<span class="pill green">'+ic('check',12)+' Winner rolled out</span>'
+    :e.status==='kept'?'<span class="pill gray">Ended · current version kept</span>'
+    :e.stage==='fin'?'<span class="pill green">Result ready</span>':'<span class="pill blue">'+ic('flask',12)+` Running · day ${day} of ~${e.days}</span>`;
+  const bar=(name,sub,v,ci,col)=>`<div class="rb-row ${e.stage==='mid'?'faded':''}"><div class="nm">${name}<small>${sub}</small></div>
+    <div class="rtrack"><div class="fill" style="width:${v/m.max*100}%;background:${col}"></div>
+    <div class="ci" style="left:${Math.max(0,(v-ci)/m.max*100)}%;width:${Math.min(100,(2*ci)/m.max*100)}%"></div></div>
+    <div class="v">${fx(v)}${m.unit==='/5'?'':m.unit.trim()==='pts'?'':m.unit}</div></div>`;
+  let main='';
+  if(e.stage==='start'){
+    main=`<div class="empty"><div class="big">${ic('clock')}</div><h3 style="color:var(--ink)">Collecting data</h3><p style="margin-top:6px">${n} learners so far. Early trends appear after a few days, and the decision unlocks once ${fmt(REQUIRED)} learners have taken part.</p></div>`;
+  } else {
+    const ready=e.stage==='fin';
+    main=`
+    ${ready?`<div class="callout good"><div class="ic">${ic('check')}</div><div class="body"><b>B is better: +${fx(lift)}${m.unit==='%'?' points':m.unit==='/5'?'':' pts'} ${m.label.toLowerCase()}.</b><p>${vals[3]}% chance that B really is better (threshold: 95%). The guardrail held.</p></div></div>`
+      :`<div class="callout warn"><div class="ic">${ic('warn')}</div><div class="body"><b>Not enough data yet. Don’t decide on these numbers.</b><p>Early results swing a lot. Right now there’s a ${vals[3]}% chance B is better, and we need 95%. The decision unlocks in about ${e.days-midDay+1} days.</p></div></div>`}
+    <div style="margin-top:18px"><div class="small muted" style="font-weight:700;margin-bottom:8px">${m.label.toUpperCase()} <span style="font-weight:500">· bar = result, whiskers = uncertainty range</span></div>
+    <div class="rbars">${bar('A · Control',e.controlName,vals[0],vals[2],'#B9B9CC')}${bar('B · Variant',e.variantName,vals[1],vals[2],ready?'var(--blue)':'#7F87E4')}</div></div>
+    <div class="guard">${ready?`<span class="pill green">${ic('check',12)} Guardrail held</span>`:`<span class="pill gray">${ic('clock',12)} Guardrail: checking</span>`}
+      <span><b>${g.label}:</b> A ${g.a} · B ${ready?g.b:'…'}</span></div>
+    <div class="decision">
+      ${e.status==='rolled'?`<span class="pill green" style="font-size:13px;padding:6px 12px">${ic('check',13)} Rolled out to all learners on ${esc(e.decidedOn)}</span><a class="btn sm" href="#/course/${c.id}">Back to course</a>`
+       :e.status==='kept'?`<span class="pill gray" style="font-size:13px;padding:6px 12px">Current version kept on ${esc(e.decidedOn)}. Result saved to the idea log.</span>`
+       :ready?`<button class="btn primary" data-act="rollout" data-arg="${e.id}">${ic('send')} Roll out B to all learners</button><button class="btn" data-act="keep" data-arg="${e.id}">Keep current version</button>`
+       :`<button class="btn" disabled>${ic('lock')} Roll out B</button><button class="btn" disabled>${ic('lock')} Keep current</button><span class="small muted">Unlocks at ${fmt(REQUIRED)} learners</span>`}
+    </div>`;
+  }
+  const canTravel=e.status==='running';
+  return `
+  <div class="crumbs"><a href="#/experiments">Experiments</a> / <span>${esc(e.name)}</span></div>
+  <div class="page-head"><div><h1>${esc(e.name)}</h1><p class="muted"><a href="#/course/${c.id}">${esc(c.title)}</a></p></div><div>${status}</div></div>
+  ${canTravel?`<div class="timebar"><span class="lbl">${ic('ff',14)} Prototype time travel</span>
+    <div class="seg" role="group" aria-label="Simulate time">
+      <button class="${e.stage==='start'?'on':''}" data-act="stage" data-arg="start">Day 1</button>
+      <button class="${e.stage==='mid'?'on':''}" data-act="stage" data-arg="mid">Day ${midDay}</button>
+      <button class="${e.stage==='fin'?'on':''}" data-act="stage" data-arg="fin">Day ${finDay}</button></div>
+    <span class="small muted">Simulates the experiment over time</span></div>`:''}
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-head"><h2>Results</h2><span class="small muted">Amplitude · updated hourly</span></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:13px"><b>${fmt(Math.min(n,REQUIRED))} of ${fmt(REQUIRED)} learners</b><span class="muted">${e.stage==='fin'?'Target reached':`~${e.days-day+1} days left`}</span></div>
+        <div class="progress"><span style="width:${Math.min(100,n/REQUIRED*100)}%"></span></div></div>
+      ${main}
+    </div>
+    <div class="stack">
+      <div class="card"><h2 style="margin-bottom:10px">Hypothesis</h2>
+        <div class="hyp">If we <b>${esc(clean(e.change))}</b>, then <b>${m.label.toLowerCase()}</b> will improve, because ${esc(clean(e.why))}.</div></div>
+      <div class="card"><h2 style="margin-bottom:12px">Setup</h2><div class="kv">
+        <div><span>Audience</span>${e.clients.map(k=>CLIENTS.find(x=>x.id===k).name).join(', ')}</div>
+        <div><span>Split</span>50% A · 50% B, assigned at random</div>
+        <div><span>Guardrail</span>${g.label} must not drop</div>
+        <div><span>Learner experience</span>Each learner sees one version only</div></div></div>
+    </div>
+  </div>`;
+}
+
+function viewExperiments(){
+  const rows=S.experiments.slice().reverse();
+  return `
+  <div class="page-head"><div><h1>Experiments</h1><p class="muted">Every idea tested before it’s built.</p></div></div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Experiment</th><th>Course</th><th>Primary metric</th><th>Status</th><th>Result</th></tr></thead>
+      <tbody>${rows.map(e=>{const m=METRICS[e.metric]; const st=e.status==='rolled'?'<span class="pill green">Winner rolled out</span>':e.status==='kept'?'<span class="pill gray">Current kept</span>':e.stage==='fin'?'<span class="pill green">Result ready</span>':'<span class="pill blue">Running</span>';
+        const res=e.stage==='fin'?`+${m.dec?(m.fin[1]-m.fin[0]).toFixed(1):m.fin[1]-m.fin[0]}${m.unit==='%'?' pts':m.unit==='/5'?'':m.unit} · ${m.fin[3]}% confidence`:'<span class="muted">Collecting data</span>';
+        return `<tr class="row" data-go="#/exp/${e.id}" tabindex="0"><td class="ctitle">${esc(e.name)}</td><td>${esc(course(e.courseId).title)}</td><td>${m.label}</td><td>${st}</td><td>${res}</td></tr>`}).join('')}</tbody>
+    </table></div>
+  </div>
+  <div class="callout lock"><div class="ic">${ic('bulb')}</div><div class="body"><b>40+ stakeholder ideas are waiting.</b><p>Idea intake (Phase 2) will turn each one into a hypothesis like the ones above, so the team tests the most promising first.</p></div></div>`;
+}
+function notFound(){return `<div class="card empty"><h3 style="color:var(--ink)">Page not found</h3><p style="margin:6px 0 14px">This link doesn’t exist in the prototype.</p><a class="btn" href="#/insights">Back to Insights</a></div>`;}
+
+/* ---------- modal ---------- */
+function modal(){
+  const md=S.modal;
+  if(md.type==='rollout'){
+    const e=S.experiments.find(x=>x.id===md.id), c=course(e.courseId);
+    return `<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt" data-stop>
+      <h3 id="mt">Roll out “${esc(e.variantName)}” to all learners?</h3>
+      <p class="muted">${e.kind==='delivery'?'All clients will get the new reminder schedule from tomorrow.':`B replaces the current version of <b>${esc(c.title)}</b> for every client from tomorrow. Learners already in progress keep the version they started.`}</p>
+      <div class="acts"><button class="btn" data-act="closeModal">Cancel</button><button class="btn primary" data-act="confirmRollout" data-arg="${e.id}">${ic('send')} Roll out</button></div>
+    </div></div>`;
+  }
+  if(md.type==='preview'){
+    const chips=['Too long','Not relevant to my job','Too basic','Very useful'];
+    return `<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="pt" data-stop>
+      <h3 id="pt" style="display:flex;align-items:center">What learners see <button class="btn sm" style="margin-left:auto" data-act="closeModal" aria-label="Close">${ic('x')}</button></h3>
+      <div class="lp"><div class="lp-top"><span>Data Storytelling for Managers</span><span>Module 1 of 4</span></div>
+        <div class="lp-body">
+          <div class="lp-check">${ic('check')}</div><h3>Module 1 done</h3>
+          ${md.reason?`<p style="margin-top:12px;font-weight:600">Thanks, that helps us improve this course.</p>`:`
+          <p class="muted" style="margin-top:8px">How useful was this module?</p>
+          <div class="faces">${[1,2,3,4,5].map(n=>`<button class="${md.rating===n?'on':''}" data-act="rate" data-arg="${n}" aria-label="${n} out of 5">${n}</button>`).join('')}</div>
+          <div class="scale-lbl"><span>Not useful</span><span>Very useful</span></div>
+          ${md.rating?`<p class="muted small" style="margin-top:12px">Anything we should know? (optional)</p><div class="lp-chips">${chips.map(c=>`<button class="chip" data-act="reason" data-arg="${c}">${c}</button>`).join('')}</div>`:''}`}
+          <div class="lp-actions"><button class="btn sm" data-act="closeModal">Skip</button><button class="btn primary sm" data-act="closeModal">Continue to Module 2 ${ic('right')}</button></div>
+        </div></div>
+      <p class="lp-note">One tap, optional, and it never blocks the learner. Sent to Amplitude as <code>module_rated</code>.</p>
+    </div></div>`;
+  }
+  return '';
+}
+
+/* ---------- router & render ---------- */
+function parse(){
+  const h=(location.hash||'#/insights').slice(2); const [path,q]=h.split('?'); const parts=path.split('/');
+  return {route:parts[0]||'insights',id:parts[1],q:new URLSearchParams(q||'')};
+}
+let lastRoute='';
+function render(){
+  const {route,id,q}=parse(); let html;
+  if(route==='insights') html=viewInsights();
+  else if(route==='course') html=viewCourse(id);
+  else if(route==='new') html=viewNew(id,q.get('kind')||'content');
+  else if(route==='exp') html=viewExp(id);
+  else if(route==='experiments') html=viewExperiments();
+  else html=notFound();
+  document.getElementById('app').innerHTML=shell(route,html);
+  const key=location.hash; if(key!==lastRoute){window.scrollTo(0,0); lastRoute=key;}
+}
+function toast(msg){
+  const t=document.getElementById('toast'); t.innerHTML=ic('check')+' '+esc(msg); t.classList.add('show');
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+const A={
+  filter:a=>{S.filter=a;render();},
+  guide:()=>{S.guide=true;render();},
+  closeGuide:()=>{S.guide=false;render();},
+  reset:()=>{S=seedState();S.guide=true;location.hash='#/insights';render();toast('Demo reset');},
+  newExp:id=>{S.draft=null;location.hash='#/new/'+id;},
+  newDelivery:id=>{S.draft=null;location.hash='#/new/'+id+'?kind=delivery';},
+  next:()=>{const d=S.draft;d.errors=validate(d);if(Object.keys(d.errors).length){render();const el=document.querySelector('.err input,.err textarea,.errmsg');el&&el.focus&&el.focus();return;}d.step++;render();},
+  back:()=>{const d=S.draft;if(d.step===1){location.hash='#/course/'+d.courseId;S.draft=null;return;}d.errors={};d.step--;render();},
+  launch:()=>{
+    const d=S.draft, est=estimate(d), v=VARIANTS[d.kind].find(x=>x.id===d.variant);
+    const id='exp-'+(S.experiments.length+1);
+    S.experiments.push({id,courseId:d.courseId,kind:d.kind,name:`${v.name} vs. current ${d.kind==='delivery'?'reminder':'version'}`,
+      change:d.change,why:d.why,metric:d.metric,guardrail:d.guardrail,variantName:v.name,
+      controlName:d.kind==='delivery'?'Monday 09:00':'v1 · Current course',clients:est.sel.map(k=>k.id),learners:est.learners,days:est.days,stage:'start',status:'running'});
+    S.draft=null; location.hash='#/exp/'+id; toast('Experiment launched');
+  },
+  stage:a=>{const {id}=parse();const e=S.experiments.find(x=>x.id===id);e.stage=a;render();},
+  rollout:id=>{S.modal={type:'rollout',id};render();},
+  confirmRollout:id=>{const e=S.experiments.find(x=>x.id===id);e.status='rolled';e.decidedOn=today();S.modal=null;render();toast('Rolled out to all learners');},
+  keep:id=>{const e=S.experiments.find(x=>x.id===id);e.status='kept';e.decidedOn=today();render();toast('Current version kept. Result saved.');},
+  preview:()=>{S.modal={type:'preview'};render();},
+  rate:n=>{S.modal.rating=+n;render();},
+  reason:r=>{S.modal.reason=r;render();},
+  closeModal:()=>{S.modal=null;render();}
+};
+
+document.addEventListener('click',ev=>{
+  const stop=ev.target.closest('[data-stop]');
+  const t=ev.target.closest('[data-act]');
+  if(t && !(t.classList.contains('overlay') && stop)){ ev.preventDefault(); A[t.dataset.act]&&A[t.dataset.act](t.dataset.arg); return; }
+  const row=ev.target.closest('[data-go]'); if(row && !ev.target.closest('a,button')) location.hash=row.dataset.go;
+});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'){const row=ev.target.closest&&ev.target.closest('[data-go]'); if(row){location.hash=row.dataset.go;}}
+  if(ev.key==='Escape'&&S.modal){S.modal=null;render();}
+});
+document.addEventListener('input',ev=>{const f=ev.target.dataset&&ev.target.dataset.field; if(f&&S.draft&&ev.target.tagName!=='SELECT'){S.draft[f]=ev.target.value;}});
+document.addEventListener('change',ev=>{
+  const el=ev.target; if(!S.draft) return;
+  if(el.tagName==='SELECT'&&el.dataset.field){S.draft[el.dataset.field]=el.value;render();}
+  else if(el.name==='variant'){S.draft.variant=el.value;render();}
+  else if(el.dataset.client){S.draft.clients[el.dataset.client]=el.checked; if(S.draft.errors.clients&&el.checked) delete S.draft.errors.clients; render();}
+});
+window.addEventListener('hashchange',render);
+render();
+</script>
+</body>
+</html>
